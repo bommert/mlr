@@ -85,6 +85,18 @@ timeboth = makeMeasure(id = "timeboth", minimize = TRUE, best = 0, worst = Inf,
   }
 )
 
+#' @export stability
+#' @rdname measures
+#' @format none
+stability = makeMeasure(id = "stability", minimize = FALSE, best = 1, worst = -1,
+  properties = c("classif", "classif.multi", "multilabel", "regr", "surv", "costsens", "cluster"),
+  name = "Stability of feature selection",
+  fun = function(task, model, pred, feats, extra.args) {
+    NA
+  },
+  aggr = stability.phi
+)
+
 ###############################################################################
 ### regression ###
 ###############################################################################

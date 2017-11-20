@@ -254,7 +254,13 @@ mergeResampleResult = function(learner.id, task, iter.results, measures, rin, mo
   # aggr = vnapply(measures, function(m) m$aggr$fun(task, ms.test[, m$id], ms.train[, m$id], m, rin$group, pred))
   aggr = vnapply(seq_along(measures), function(i) {
     m = measures[[i]]
-    m$aggr$fun(task, ms.test[, i], ms.train[, i], m, rin$group, pred)
+    if (m$id == "stability") {
+      assertTRUE(models)
+      fitted.models = lapply(iter.results, function(x) x$model)
+      m$aggr$fun(task, ms.test[, i], ms.train[, i], m, rin$group, pred, fitted.models)
+    } else {
+      m$aggr$fun(task, ms.test[, i], ms.train[, i], m, rin$group, pred)
+    }
   })
   names(aggr) = vcapply(measures, measureAggrName)
 
