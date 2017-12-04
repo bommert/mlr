@@ -39,6 +39,34 @@ test_that("tuneParamsMultiCrit", {
   res = tuneParamsMultiCrit(lrn, binaryclass.task, rdesc, par.set = ps,
     measures = list(tpr, fpr), control = ctrl)
   mycheck(res, 8L)
+
+  # MBO
+  ctrl = makeTuneMultiCritControlMBO(2L, budget = 4L * length(ps$pars) + 1L)
+  res = tuneParamsMultiCrit(lrn, binaryclass.task, rdesc, par.set = ps,
+    measures = list(tpr, fpr), control = ctrl)
+  mycheck(res, 4L * length(ps$pars) + 1L)
+
+  # MBO with mbo.control
+  # Size of init design is 4 * length(ps$pars) by default of mlrMBO
+  mbo.control = mlrMBO::makeMBOControl(n.objectives = 2L)
+  mbo.control = mlrMBO::setMBOControlInfill(mbo.control,
+    crit = mlrMBO::makeMBOInfillCritDIB())
+  mbo.control = mlrMBO::setMBOControlMultiObj(mbo.control)
+  mbo.control = mlrMBO::setMBOControlTermination(mbo.control, iters = 1)
+  ctrl = makeTuneMultiCritControlMBO(mbo.control = mbo.control)
+  res = tuneParamsMultiCrit(lrn, binaryclass.task, rdesc, par.set = ps,
+    measures = list(tpr, fpr), control = ctrl)
+  mycheck(res, 4L * length(ps$pars) + 1L)
+
+  # MBO with dependent param set
+  lrn = makeLearner("classif.ksvm")
+  ps = makeParamSet(makeDiscreteParam("kernel", c("polydot", "rbfdot")),
+    makeNumericParam("sigma", lower = -12, upper = 12,
+      trafo = function(x) 2^x, requires = quote(kernel == "rbfdot")))
+  ctrl = makeTuneMultiCritControlMBO(2L, budget = 4L * length(ps$pars) + 1L)
+  res = tuneParamsMultiCrit(lrn, binaryclass.task, rdesc, par.set = ps,
+    measures = list(tpr, fpr), control = ctrl)
+  mycheck(res, 4L * length(ps$pars) + 1L)
 })
 
 
@@ -158,4 +186,27 @@ test_that("tuneParamsMultiCrit with resample.fun", {
   res = tuneParamsMultiCrit(lrn, binaryclass.task, rdesc, par.set = ps,
     measures = list(tpr, fpr), control = ctrl, resample.fun = constant05Resample)
   expect_true(all(getOptPathY(res$opt.path) == 0.5))
+
+  # MBO
+  ctrl = makeTuneMultiCritControlMBO(2L, budget = 4L * length(ps$pars) + 1L, learner = "regr.lm")
+  res = tuneParamsMultiCrit(lrn, binaryclass.task, rdesc, par.set = ps,
+    measures = list(tpr, fpr), control = ctrl, resample.fun = constant05Resample)
+  expect_true(all(getOptPathY(res$opt.path) == 0.5))
+})
+
+test_that("check n.objectives for MBO multi crit", {
+  lrn =  makeLearner("classif.rpart")
+  rdesc = makeResampleDesc("Holdout")
+  ps = makeParamSet(
+    makeIntegerParam("minsplit", lower = 1, upper = 50)
+  )
+
+  expect_error(makeTuneMultiCritControlMBO(1L))
+  expect_error(makeTuneMultiCritControlMBO(1.5))
+  ctrl = makeTuneMultiCritControlMBO(2L)
+
+  expect_error(tuneParamsMultiCrit(lrn, binaryclass.task, rdesc, measures = list(mmce),
+    par.set = ps, control = ctrl))
+  expect_error(tuneParamsMultiCrit(lrn, binaryclass.task, rdesc, measures = list(mmce, tpr, fpr),
+    par.set = ps, control = ctrl))
 })
