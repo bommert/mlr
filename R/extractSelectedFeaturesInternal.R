@@ -4,13 +4,11 @@
 #' the \code{\link{WrappedModel}} and the \code{\link{Learner}} which was used to
 #' train the model.
 #'
-#' @param model [\code{\link{WrappedModel}}]\cr
-#'   Wrapped model, result of \code{\link{train}}.
+#' @inheritParams extractSelectedFeatures
+#' @inherit extractSelectedFeatures return
 #' @param learner [\code{\link{Leaner}}]\cr
 #'   The learner which was used to train the model. This internal function will
 #'   always be called with \code{learner} set to \code{model$learner}.
-#' @return [\code{character(n)}]\cr
-#'   Names of selected features.
 #' @export
 #' @note Only exported for extension purposes. For usage see
 #' \code{\link{extractSelectedFeatures}}.
@@ -44,6 +42,16 @@ extractSelectedFeaturesInternal.classif.glmboost = function(learner, model) {
       return(feats)
     }
   }
+}
+
+#' @export
+extractSelectedFeaturesInternal.classif.kknn = function(learner, model) {
+  return(model$features)
+}
+
+#' @export
+extractSelectedFeaturesInternal.classif.knn = function(learner, model) {
+  return(model$features)
 }
 
 #' @export
@@ -111,6 +119,11 @@ extractSelectedFeaturesInternal.classif.ranger = function(learner, model) {
 
 #' @export
 extractSelectedFeaturesInternal.classif.rda = function(learner, model) {
+  return(model$features)
+}
+
+#' @export
+extractSelectedFeaturesInternal.classif.rknn = function(learner, model) {
   return(model$features)
 }
 

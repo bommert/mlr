@@ -29,18 +29,11 @@ classifSelectNone = function(learner.name, ...) {
   invisible(NULL)
 }
 
-classifErrors = function(learner.name, message, ...) {
-  res = tryCatch(
-    trainLearnExtract(learner.name, sonar.task, ...),
-    error = function(e) e$message
-  )
-  expect_set_equal(res, message)
-  invisible(NULL)
-}
-
 
 classif.learners = c(
   "classif.glmboost",
+  "classif.kknn",
+  "classif.knn",
   "classif.ksvm",
   "classif.LiblineaRL1L2SVC",
   "classif.LiblineaRL1LogReg",
@@ -49,6 +42,7 @@ classif.learners = c(
   "classif.LiblineaRL2SVC",
   "classif.LiblineaRMultiClassSVC",
   "classif.rda",
+  "classif.rknn",
   "classif.rpart",
   "classif.xgboost"
 )
@@ -90,6 +84,6 @@ test_that("filter wrapper", {
 
 
 test_that("errors for required parameters", {
-  classifErrors("classif.ranger",
-    message = "For extracting the selected features of classif.ranger set 'importance' to 'impurity' or 'permutation'!")
+  expect_error(trainLearnExtract("classif.ranger", sonar.task),
+    "For extracting the selected features of classif.ranger set .*")
 })

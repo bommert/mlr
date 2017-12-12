@@ -10,7 +10,7 @@
 #'   Names of selected features.
 #' @export
 #' @examples
-#' lrn = makeLearner("classif.LiblineaRL1LogReg", cost = 0.5, epsilon = 1e-4)
+#' lrn = makeLearner("classif.rpart")
 #' mod = train(lrn, sonar.task)
 #' extractSelectedFeatures(mod)
 #' @note Currently, this function only works for some classification models.
