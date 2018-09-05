@@ -1,12 +1,12 @@
 #' @export
 #' @inheritParams makeTuneControlMBO
-#' @param n.objectives [\code{integer(1)}]\cr
-#'   Number of objectives, i.e. number of \code{\link{Measure}}s to optimize.
+#' @param n.objectives (`integer(1)`)\cr
+#'   Number of objectives, i.e. number of [Measure]s to optimize.
 #' @rdname TuneMultiCritControl
 makeTuneMultiCritControlMBO = function(n.objectives = mbo.control$n.objectives,
   same.resampling.instance = TRUE, impute.val = NULL,
   learner = NULL, mbo.control = NULL, tune.threshold = FALSE, tune.threshold.args = list(),
-  continue = FALSE, log.fun = "default", final.dw.perc = NULL, budget = NULL, mbo.keep.result = FALSE,
+  continue = FALSE, log.fun = "default", final.dw.perc = NULL, budget = NULL,
   mbo.design = NULL) {
 
   assertInt(n.objectives, lower = 2L)
@@ -22,7 +22,6 @@ makeTuneMultiCritControlMBO = function(n.objectives = mbo.control$n.objectives,
   }
   assertClass(mbo.control, "MBOControl")
   assertFlag(continue)
-  assertFlag(mbo.keep.result)
 
   if (!is.null(budget) && !is.null(mbo.design) && nrow(mbo.design) > budget)
     stopf("The size of the initial design (init.design.points = %i) exceeds the given budget (%i).",
@@ -37,7 +36,6 @@ makeTuneMultiCritControlMBO = function(n.objectives = mbo.control$n.objectives,
   x$learner = learner
   x$mbo.control = mbo.control
   x$continue = continue
-  x$mbo.keep.result = mbo.keep.result
   x$mbo.design = mbo.design
   return(x)
 }

@@ -4,16 +4,6 @@ tuneMBO = function(learner, task, resampling, measures, par.set, control,
   requirePackages("mlrMBO", why = "tuneMBO", default.method = "load")
   mbo.control = control$mbo.control
 
-  # put all required info into the function env
-  force(learner)
-  force(task)
-  force(resampling)
-  force(measures)
-  force(par.set)
-  force(control)
-  force(opt.path)
-  force(show.info)
-
   multicrit = mbo.control$n.objectives > 1L
   if (multicrit) {
     assertList(measures, len = mbo.control$n.objectives)
@@ -28,8 +18,7 @@ tuneMBO = function(learner, task, resampling, measures, par.set, control,
     messagef("Resuming previous MBO run using state in '%s'...", state)
     or = mlrMBO::mboContinue(state)
   } else {
-    or = mlrMBO::mbo(tff, design = control$mbo.design, learner = control$learner,
-      control = mbo.control, show.info = FALSE)
+    or = mlrMBO::mbo(tff, design = control$mbo.design, learner = control$learner, control = mbo.control, show.info = FALSE)
   }
 
   if (multicrit) {
@@ -38,21 +27,24 @@ tuneMBO = function(learner, task, resampling, measures, par.set, control,
     colnames(y) = opt.path$y.names
     ind = or$pareto.inds
   } else {
+    # we take the point that mbo proposes and its estimated y
     x = trafoValue(par.set, or$x)
     y = setNames(or$y, opt.path$y.names[1L])
-    # we take the point that mbo proposes and its estimated y
   }
 
-  # FIXME: threshold
-  if (!control$mbo.keep.result)
-    or = NULL
-
+  # if threshold tuning is on, we extract the threshold from extras
+  if (control$tune.threshold) {
+    el = getOptPathEl(opt.path, or$best.ind)
+    th = el$extra$threshold
+  } else {
+    th = NULL
+  }
   if (multicrit) {
-    res = makeTuneMultiCritResult(learner, ind, removeMissingValues(x), y, control,
+    res = makeTuneMultiCritResult(learner, ind, removeMissingValues(x), y, resampling, control,
       opt.path, measures, mbo.result = or)
   } else {
-    res = makeTuneResult(learner, control, removeMissingValues(x), y, NULL,
-      opt.path, mbo.result = or)
+    res = makeTuneResult(learner, control, removeMissingValues(x), y, resampling, th, opt.path,
+      mbo.result = or)
   }
 
   return(res)

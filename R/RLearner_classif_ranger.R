@@ -11,6 +11,7 @@ makeRLearner.classif.ranger = function() {
       makeIntegerLearnerParam(id = "min.node.size", lower = 1L),
       makeLogicalLearnerParam(id = "replace", default = TRUE),
       makeNumericLearnerParam(id = "sample.fraction", lower = 0L, upper = 1L),
+      makeNumericVectorLearnerParam(id = "case.weights"),
       makeNumericVectorLearnerParam(id = "split.select.weights", lower = 0, upper = 1),
       makeUntypedLearnerParam(id = "always.split.variables"),
       makeDiscreteLearnerParam("respect.unordered.factors", values = c("ignore", "order", "partition"), default = "ignore"),
@@ -35,7 +36,7 @@ makeRLearner.classif.ranger = function() {
 }
 
 #' @export
-trainLearner.classif.ranger = function(.learner, .task, .subset, .weights = NULL, mtry, mtry.perc, min.node.size, ...) {
+trainLearner.classif.ranger = function(.learner, .task, .subset, .weights = NULL, mtry, mtry.perc, min.node.size, case.weights, ...) {
   tn = getTaskTargetNames(.task)
   if (missing(mtry)) {
     if (missing(mtry.perc)) {
@@ -51,8 +52,11 @@ trainLearner.classif.ranger = function(.learner, .task, .subset, .weights = NULL
       min.node.size = 1
     }
   }
+  if (missing(case.weights)) {
+    case.weights = .weights
+  }
   ranger::ranger(formula = NULL, dependent.variable = tn, data = getTaskData(.task, .subset),
-                 probability = (.learner$predict.type == "prob"), case.weights = .weights, mtry = mtry, min.node.size = min.node.size, ...)
+                 probability = (.learner$predict.type == "prob"), case.weights = case.weights, mtry = mtry, min.node.size = min.node.size, ...)
 }
 
 #' @export
