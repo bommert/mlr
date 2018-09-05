@@ -1,20 +1,17 @@
-#' Internal method for extracting the selected features from a model.
+#' @title Internal method for extracting the selected features from a model.
 #'
-#' S3 method for selecting the features which are used in a model, given
-#' the \code{\link{WrappedModel}} and the \code{\link{Learner}} which was used to
+#' @description S3 method for selecting the features which are used in a model, given
+#' the `WrappedModel` and the `Learner` which was used to
 #' train the model.
 #'
 #' @inheritParams extractSelectedFeatures
 #' @inherit extractSelectedFeatures return
-#' @param learner [\code{\link{Leaner}}]\cr
+#' @param learner `Leaner`\cr
 #'   The learner which was used to train the model. This internal function will
-#'   always be called with \code{learner} set to \code{model$learner}.
+#'   always be called with `learner` set to `model$learner`.
 #' @export
-#' @note Only exported for extension purposes. For usage see
-#' \code{\link{extractSelectedFeatures}}.
-
-
-#' @export
+#' @section Note: Only exported for extension purposes. For usage see
+#' `extractSelectedFeatures`.
 extractSelectedFeaturesInternal = function(learner, model) {
   UseMethod("extractSelectedFeaturesInternal")
 }

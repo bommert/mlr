@@ -27,9 +27,6 @@
 #'     on the aggregation, especially for cross-validation test.join might make sense now.
 #'     For the repeated CV, the performance is calculated on each repetition and then aggregated
 #'     with the arithmetic mean.}
-#'   \item{\bold{stability.phi}{\cr Stability of feature selection based on at least two sets
-#'     of chosen features. For all pairs of sets, a contingency table is calculated. The stability
-#'     is assessed by the mean phi coefficient of the contingency tables.}}
 #' }
 #' @format None
 #' @seealso [Aggregation]
@@ -262,58 +259,5 @@ test.join = makeAggregation(
         time = NA_real_)
       performance(npred, measure)
     }))
-  }
-)
-
-
-#' @export
-#' @rdname aggregations
-stability.phi = makeAggregation(
-  id = "phi",
-  name = "Stability Aggregation by Phi Coefficient",
-  # either req.train or req.test is needed for resample not to break
-  # if show.info = TRUE
-  # could be properties = character(0L) if show.info were always FALSE
-  properties = "req.test",
-  fun = function(task, perf.test, perf.train, measure, group, pred, models) {
-    p = getTaskNFeats(task)
-    n = length(models)
-
-    if (length(models) < 2) {
-      stop("For stability evaluation, at least two models are needed!")
-    }
-
-    features = lapply(models, function(m) extractSelectedFeatures(m))
-    selected = unique(unlist(features))
-
-    # write feature sets in matrix coded by 0 and 1
-    feat.mat = matrix(0L, ncol = n, nrow = p)
-    for (i in 1:n) {
-      feat.indices = which(selected %in% features[[i]])
-      feat.mat[feat.indices, i] = 1L
-    }
-
-    # phi coefficient
-    phi = function(x, y) {
-      tab = addmargins(table(x, y))
-      check.dim = checkMatrix(tab, nrows = 3, ncols = 3)
-      if (check.dim == TRUE) {
-        numerator = tab[1, 1] * tab[2, 2] - tab[1, 2] * tab[2, 1]
-        denominator = sqrt(tab[1, 3] * tab[2, 3] * tab[3, 1] * tab[3, 2])
-        return(numerator / denominator)
-      } else {
-        return(NA)
-      }
-    }
-
-    # phi coefficients for pairwise comparisons
-    phis = lapply(1:(n - 1), function(i) {
-      vnapply((i + 1):n, function(j) {
-        phi(feat.mat[, i], feat.mat[, j])
-      })
-    })
-
-    res = mean(unlist(phis))
-    return(res)
   }
 )

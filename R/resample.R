@@ -46,7 +46,6 @@
 #'   Default is `FALSE`.
 #'   Must be set to `TRUE` if `measures` includes `stability`.
 #' @param extract (`function`)\cr
->>>>>>> master
 #'   Function used to extract information from a fitted model during resampling.
 #'   Is applied to every [WrappedModel] resulting from calls to [train]
 #'   during resampling.
@@ -262,7 +261,7 @@ mergeResampleResult = function(learner.id, task, iter.results, measures, rin, mo
   # aggr = vnapply(measures, function(m) m$aggr$fun(task, ms.test[, m$id], ms.train[, m$id], m, rin$group, pred))
   aggr = vnapply(seq_along(measures), function(i) {
     m = measures[[i]]
-    if (m$id == "stability") {
+    if (length(grep(m$id, pattern = "stability")) > 0) {
       assertTRUE(models)
       fitted.models = lapply(iter.results, function(x) x$model)
       m$aggr$fun(task, ms.test[, i], ms.train[, i], m, rin$group, pred, fitted.models)
