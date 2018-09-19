@@ -52,6 +52,18 @@ featperc = makeMeasure(id = "featperc", minimize = TRUE, best = 0, worst = 1,
   }
 )
 
+#' @export
+#' @rdname measures
+#' @format none
+featperc.selected = makeMeasure(id = "featperc.selected", minimize = TRUE, best = 0, worst = 1,
+  properties = c("classif", "classif.multi", "multilabel", "regr", "surv", "costsens", "cluster", "req.model", "req.pred"),
+  name = "Percentage of original features used for model",
+  note =  "Useful for feature selection.",
+  fun = function(task, model, pred, feats, extra.args) {
+    length(extractSelectedFeatures(model)) / sum(pred$task.desc$n.feat)
+  }
+)
+
 #' @export timetrain
 #' @rdname measures
 #' @format none

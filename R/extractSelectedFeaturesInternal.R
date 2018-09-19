@@ -16,6 +16,11 @@ extractSelectedFeaturesInternal = function(learner, model) {
   UseMethod("extractSelectedFeaturesInternal")
 }
 
+extractSelectedFeaturesInternal.default = function(learner, model) {
+  warning("No method for extracting the selected features of this model available. Using all features.")
+  return(model$features)
+}
+
 #' @export
 extractSelectedFeaturesInternal.BaseWrapper = function(learner, model) {
   extractSelectedFeaturesInternal(model$learner.model$next.model$learner, model$learner.model$next.model)
